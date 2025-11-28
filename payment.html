@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LoveBloom – Payment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary: #ff4b7d;
+      --primary-light: #ff9bb5;
+      --bg: #fff5f8;
+      --dark: #2b2b2b;
+      --card-bg: #ffffff;
+      --accent: #ffb347;
+      --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.08);
+      --radius-xl: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #ffe1ec, #fff5f8 40%, #ffffff 80%);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(90deg, rgba(255, 245, 248, 0.94), rgba(255, 255, 255, 0.96));
+      border-bottom: 1px solid rgba(255, 192, 203, 0.4);
+    }
+
+    .nav-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0.7rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .logo span.icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffe6f0, #ff4b7d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 1.8rem auto 2.2rem;
+      padding: 0 1.2rem;
+    }
+
+    .page-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .page-title h1 {
+      font-size: 1.6rem;
+    }
+
+    .step-indicator {
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    .step-indicator span.current {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 1.4rem;
+      align-items: flex-start;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 1rem 1.1rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      margin-bottom: 0.7rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: #777;
+      margin-bottom: 0.8rem;
+    }
+
+    .highlight {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .amount-due {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .method-list {
+      display: grid;
+      gap: 0.7rem;
+      margin-top: 0.5rem;
+    }
+
+    .method {
+      border-radius: 16px;
+      border: 1px solid #f1d2dd;
+      padding: 0.6rem 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      cursor: pointer;
+      background: #fffdfd;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      font-size: 0.85rem;
+    }
+
+    .method input {
+      accent-color: var(--primary);
+    }
+
+    .method.selected {
+      border-color: var(--primary-light);
+      background: #fff5fa;
+      box-shadow: 0 6px 18px rgba(255, 75, 125, 0.15);
+    }
+
+    .method span.icon {
+      font-size: 1.1rem;
+    }
+
+    .method label {
+      font-weight: 600;
+    }
+
+    .method small {
+      display: block;
+      font-size: 0.74rem;
+      color: #777;
+    }
+
+    .code-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 0.45rem 0.55rem;
+      border-radius: 10px;
+      border: 1px solid #e3c2cf;
+      font-size: 0.85rem;
+      outline: none;
+      background: #fffdfd;
+      flex: 1;
+    }
+
+    input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 2px rgba(255, 151, 171, 0.2);
+    }
+
+    .btn-outline {
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      background: #fff;
+      border: 1px solid rgba(255, 151, 171, 0.9);
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .btn-outline:hover {
+      background: #fff9fc;
+    }
+
+    .btn-primary {
+      margin-top: 0.8rem;
+      border-radius: 999px;
+      padding: 0.55rem 1.1rem;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(255, 75, 125, 0.4);
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 35px rgba(255, 75, 125, 0.5);
+    }
+
+    .note {
+      font-size: 0.78rem;
+      color: #777;
+      margin-top: 0.35rem;
+    }
+
+    .summary-list {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .summary-line {
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-line span.label {
+      font-weight: 600;
+    }
+
+    .cart-mini {
+      margin-top: 0.7rem;
+      border-radius: 14px;
+      border: 1px solid #f1d2dd;
+      padding: 0.6rem 0.7rem;
+      background: #fff7fa;
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+    }
+
+    .cart-mini-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 192, 203, 0.5);
+      background: #fff;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0.9rem 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.7rem;
+      font-size: 0.78rem;
+      color: #777;
+    }
+
+    @media (max-width: 820px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="icon">💐</span>
+        <span>LoveBloom</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="page">
+      <div class="page-title">
+        <h1>Payment</h1>
+        <div class="step-indicator">
+          1. Details → <span class="current">2. Payment</span> → 3. Thank you
+        </div>
+      </div>
+
+      <div class="layout">
+        <!-- LEFT: PAYMENT OPTIONS -->
+        <div class="card">
+          <div class="card-title">
+            <span>Choose payment method</span>
+          </div>
+          <p class="card-subtitle">
+            Complete the payment to confirm your surprise delivery for the birthday couple.
+          </p>
+
+          <p style="font-size:0.82rem; margin-bottom:0.4rem;">
+            Amount due: <span class="amount-due" id="amount-due">₹0</span>
+          </p>
+
+          <div class="method-list" id="method-list">
+            <label class="method selected">
+              <input type="radio" name="paymentMethod" value="UPI" checked />
+              <span class="icon">📱</span>
+              <div>
+                <label>UPI Apps (Recommended)</label>
+                <small>Pay with PhonePe, Google Pay, Paytm & more.</small>
+              </div>
+            </label>
+
+            <label class="method">
+              <input type="radio" name="paymentMethod" value="Card" />
+              <span class="icon">💳</span>
+              <div>
+                <label>Credit / Debit Card</label>
+                <small>Visa, Mastercard, Rupay, Amex supported.</small>
+              </div>
+            </label>
+
+            <label class="method">
+              <input type="radio" name="paymentMethod" value="COD" />
+              <span class="icon">🚚</span>
+              <div>
+                <label>Cash on Delivery</label>
+                <small>Pay when your bouquet is delivered (available in select cities).</small>
+              </div>
+            </label>
+          </div>
+
+          <div style="margin-top:1rem;">
+            <label style="font-size:0.78rem; display:block; margin-bottom:0.25rem;">Have a promo code?</label>
+            <div class="code-row">
+              <input type="text" id="promo-code" placeholder="Enter code e.g. LOVE10" />
+              <button class="btn-outline" type="button" onclick="applyCode()">Apply</button>
+            </div>
+            <p class="note" id="promo-note">Tip: Try <span class="highlight">LOVE10</span> 😉</p>
+          </div>
+
+          <button class="btn-primary" onclick="completePayment()">
+            Pay Securely & Place Order
+            <span>→</span>
+          </button>
+          <p class="note">
+            By continuing, you agree to LoveBloom’s terms & privacy policy. This is a demo UI; no real payment will be processed.
+          </p>
+        </div>
+
+        <!-- RIGHT: SUMMARY -->
+        <div class="card">
+          <div class="card-title">
+            <span>Delivery & order summary</span>
+          </div>
+
+          <div class="summary-list" id="summary-details"></div>
+
+          <div class="cart-mini" id="cart-mini"></div>
+
+          <p class="note">
+            You’ll receive an email & SMS once your order is confirmed. Our rider will coordinate before delivery.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>End-to-end encrypted checkout • We never store your full card details.</span>
+      <span>Made with ❤️ by LoveBloom</span>
+    </div>
+  </footer>
+
+  <script>
+    function getCart() {
+      try {
+        return JSON.parse(localStorage.getItem("lb_cart") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function getCustomer() {
+      try {
+        return JSON.parse(localStorage.getItem("lb_customer") || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    let baseTotal = parseInt(localStorage.getItem("lb_order_total") || "0", 10);
+    let discount = 0;
+
+    function renderAmount() {
+      const due = Math.max(0, baseTotal - discount);
+      document.getElementById("amount-due").textContent = "₹" + due;
+      localStorage.setItem("lb_order_payable", String(due));
+      localStorage.setItem("lb_order_discount", String(discount));
+    }
+
+    function renderSummary() {
+      const customer = getCustomer();
+      const summaryEl = document.getElementById("summary-details");
+      if (!customer) {
+        summaryEl.innerHTML =
+          '<p style="font-size:0.82rem; color:#777;">Delivery details missing. Please go back to <a href="checkout.html" class="highlight">Checkout</a>.</p>';
+      } else {
+        summaryEl.innerHTML = `
+          <div class="summary-line"><span class="label">For:</span> ${customer.customerName}${
+          customer.partnerName ? " & " + customer.partnerName : ""
+        }</div>
+          <div class="summary-line"><span class="label">Deliver to:</span> ${customer.address}, ${customer.city} - ${
+          customer.pincode
+        }</div>
+          <div class="summary-line"><span class="label">Date & slot:</span> ${
+            customer.deliveryDate
+          }, ${customer.slot}</div>
+          <div class="summary-line"><span class="label">Contact:</span> ${customer.phone} • ${customer.email}</div>
+          ${
+            customer.message
+              ? `<div class="summary-line"><span class="label">Card message:</span> “${customer.message}”</div>`
+              : ""
+          }
+        `;
+      }
+
+      const cart = getCart();
+      const cartMini = document.getElementById("cart-mini");
+      if (!cart.length) {
+        cartMini.innerHTML =
+          '<div style="font-size:0.82rem; color:#777;">Cart is empty. Please add products from <a href="index.html" class="highlight">Home</a>.</div>';
+      } else {
+        cartMini.innerHTML = cart
+          .map(
+            (item) => `
+          <div class="cart-mini-row">
+            <span>${item.name} × ${item.quantity}</span>
+            <span>₹${item.price * item.quantity}</span>
+          </div>
+        `
+          )
+          .join("");
+      }
+    }
+
+    function applyCode() {
+      const codeInput = document.getElementById("promo-code");
+      const note = document.getElementById("promo-note");
+      const code = codeInput.value.trim().toUpperCase();
+      if (!code) {
+        note.textContent = "Please enter a code.";
+        return;
+      }
+      if (code === "LOVE10") {
+        discount = Math.round(baseTotal * 0.1);
+        note.textContent = `Yay! LOVE10 applied. You saved ₹${discount}.`;
+        note.style.color = "#2ecc71";
+      } else {
+        discount = 0;
+        note.textContent = "Invalid code. Try LOVE10.";
+        note.style.color = "#e74c3c";
+      }
+      renderAmount();
+    }
+
+    // Highlight selected method
+    const methodList = document.getElementById("method-list");
+    methodList.addEventListener("change", function (e) {
+      if (e.target.name === "paymentMethod") {
+        document.querySelectorAll(".method").forEach((m) => m.classList.remove("selected"));
+        e.target.closest(".method").classList.add("selected");
+      }
+    });
+
+    function completePayment() {
+      const customer = getCustomer();
+      const cart = getCart();
+      if (!customer || !cart.length) {
+        alert("Missing order or customer details. Please go back to Checkout.");
+        window.location.href = "checkout.html";
+        return;
+      }
+      const method = document.querySelector('input[name="paymentMethod"]:checked')?.value || "UPI";
+      const payable = parseInt(localStorage.getItem("lb_order_payable") || baseTotal || 0, 10);
+
+      const orderSummary = {
+        method,
+        payable,
+        discount,
+        placedAt: new Date().toISOString(),
+      };
+      localStorage.setItem("lb_order_summary", JSON.stringify(orderSummary));
+
+      // In real app you'd now call payment gateway. For demo we just redirect.
+      window.location.href = "thankyou.html";
+    }
+
+    // Init
+    if (isNaN(baseTotal)) baseTotal = 0;
+    renderAmount();
+    renderSummary();
+  </script>
+</body>
+</html>
